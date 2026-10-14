@@ -14,9 +14,14 @@
     <meta name="apple-mobile-web-app-title" content="YESI PUTRI, S.Pd">
     <meta name="theme-color" content="#1e3a8a">
     
-    <!-- Manifest Inline untuk Mode Standalone (Layar Penuh) -->
-      <!-- PWA Manifest Configuration -->
-    <link rel="manifest" href='data:application/json,{"name":"YESI PUTRI, S.Pd","short_name":"Guru","theme_color":"#035ca1","background_color":"#f8fafc","display":"standalone","orientation":"any","scope":"./","start_url":"./","icons":[{"src":"https://iili.io/CHemQQ1.th.png","sizes":"128x128","type":"image/png"}]}' />
+    <!-- Ikon Apple Touch Icon Menggunakan Foto Guru (iOS iPhone & iPad) -->
+    <link rel="apple-touch-icon" href="https://iili.io/CHemQQ1.th.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://iili.io/CHemQQ1.th.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="https://iili.io/CHemQQ1.th.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://iili.io/CHemQQ1.th.png">
+    
+    <!-- Manifest Inline PWA (Ikon Otomatis Menggunakan Foto Guru di Chrome & Edge) -->
+    <link rel="manifest" href="data:application/json;base64,eyJkZWZhdWx0X2xvY2FsZSI6ImlkIiwibmFtZSI6IkFETSBHdXJ1IEJIUy4gSW5nZ3JpcyAtIFlFU0kgUFVUUkksIFMuUGQiLCJzaG9ydF9uYW1lIjoiWUVTSSBQVVRSSSIsInN0YXJ0X3VybCI6Ii4vIiwiZGlzcGxheSI6InN0YW5kYWxvbmUiLCJiYWNrZ3JvdW5kX2NvbG9yIjoiIzFlM2E4YSIsInRoZW1lX2NvbG9yIjoiIzFlM2E4YSIsImljb25zIjpbeyJzcmMiOiJodHRwczovL2lpbGkuaW8vQ0hlbVFRMS50aC5wbmciLCJzaXplcyI6IjE5MngxOTIiLCJ0eXBlIjoiaW1hZ2UvcG5nIiwicHVycG9zZSI6ImFueSBtYXNrYWJsZSJ9LHsic3JjIjoiaHR0cHM6Ly9paWxpLmlvL0NIZW1RUTEudGgucG5nIiwic2l6ZXMiOiI1MTJ4NTEyIiwidHlwZSI6ImltYWdlL3BuZyIsInB1cnBvc2UiOiJhbnkgbWFza2FibGUifV19">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,6 +32,10 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Library HTML5 QR Code Scanner & QR Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -55,7 +64,7 @@
         }
     </script>
     <style>
-        /* Custom Scrollbar for modern look */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -69,6 +78,14 @@
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
+        }
+
+        /* Mobile Safe Area & Touch Tweaks for iOS & Android */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 12px);
+        }
+        .mobile-nav-shadow {
+            box-shadow: 0 -4px 20px -2px rgba(0, 0, 0, 0.08);
         }
     </style>
 </head>
@@ -109,8 +126,8 @@
                 </div>
 
                 <div class="pt-8 border-t border-white/10 flex items-center justify-between text-xs text-brand-300 font-mono">
-                    <span></span>
-                    <span></span>
+                    <span>YESI PUTRI, S.Pd</span>
+                    <span>v1.0</span>
                 </div>
             </div>
         </div>
@@ -183,7 +200,7 @@
                     </div>
                     <div>
                         <h1 class="font-poppins font-bold text-lg tracking-wide leading-none text-white">Administrasi</h1>
-                        <span class=>Guru B.Inggris</span>
+                        <span class="text-xs text-brand-300">Guru B.Inggris</span>
                     </div>
                 </div>
                 <button onclick="toggleSidebar()" class="p-2 text-brand-300 hover:text-white hover:bg-brand-800 rounded-lg md:hidden">
@@ -273,7 +290,7 @@
                 </button>
 
                 <!-- Button Install PWA -->
-                <button id="pwa-install-btn" class="hidden w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-emerald-300 bg-emerald-950/40 border border-emerald-800/50 hover:bg-emerald-900/50 mt-2">
+                <button id="pwa-install-btn" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 text-emerald-300 bg-emerald-950/40 border border-emerald-800/50 hover:bg-emerald-900/50 mt-2">
                     <i class="fa-solid fa-mobile-screen-button text-lg w-6"></i>
                     <span>Instal Aplikasi</span>
                 </button>
@@ -319,36 +336,43 @@
                 </div>
 
                 <!-- Profile with custom logo on the right -->
-                <div class="flex items-center space-x-4">
-                    <div class="hidden lg:flex flex-col text-right">
-                        <span id="header-guru-nama" class="text-sm font-semibold text-slate-700">Guru Mapel</span>
-                        <span id="header-guru-nip" class="text-xs text-slate-400">NIP. -</span>
-                    </div>
-                    <div class="h-10 w-10 rounded-full flex items-center justify-center border-2 border-brand-500 shadow-md bg-white overflow-hidden shrink-0">
-                        <img src="https://iili.io/CHemQQ1.th.png" alt="Profile" class="h-full w-full object-cover" onerror="this.src='https://placehold.co/40x40/0273c4/ffffff?text=G'">
-                    </div>
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <!-- Quick Mobile QR Scanner Button in Header -->
+                <button onclick="openQRScannerModal()" class="flex md:hidden items-center gap-1.5 px-3 py-1.5 bg-brand-50 text-brand-700 hover:bg-brand-100 rounded-xl text-xs font-bold border border-brand-200 transition">
+                    <i class="fa-solid fa-qrcode text-sm text-brand-600"></i>
+                    <span>Scan QR</span>
+                </button>
+
+                <div class="hidden lg:flex flex-col text-right">
+                    <span id="header-guru-nama" class="text-sm font-semibold text-slate-700">YESI PUTRI, S.Pd</span>
+                    <span id="header-guru-nip" class="text-xs text-slate-400">NIP. -</span>
                 </div>
+                <div class="h-10 w-10 rounded-full flex items-center justify-center border-2 border-brand-500 shadow-md bg-white overflow-hidden shrink-0">
+                    <img src="https://iili.io/CHemQQ1.th.png" alt="Profile" class="h-full w-full object-cover" onerror="this.src='https://placehold.co/40x40/0273c4/ffffff?text=G'">
+                </div>
+            </div>
             </header>
 
             <!-- Content Body Wrapper -->
-            <main class="flex-1 overflow-y-auto p-6 md:p-8 bg-slate-50">
-                <div class="max-w-7xl mx-auto space-y-6">
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 bg-slate-50">
+                <!-- Added pb-24 for mobile to avoid overlap with fixed bottom navigation bar -->
+                <div class="max-w-7xl mx-auto space-y-6 pb-24 md:pb-6">
 
                     <!-- TAB: BERANDA -->
                     <section id="tab-beranda" class="tab-content space-y-6">
                         <!-- PWA Install Banner inside Dashboard -->
-                        <div id="pwa-dashboard-banner" class="hidden bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                        <div id="pwa-dashboard-banner" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
                             <div class="flex items-center space-x-3.5">
                                 <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
                                     <i class="fa-solid fa-mobile-screen-button text-2xl"></i>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-slate-800">Instal Aplikasi di Tablet / HP</h4>
-                                    <p class="text-sm text-slate-500">Jalankan aplikasi ini dalam mode layar penuh tanpa gangguan browser.</p>
+                                    <h4 class="font-bold text-slate-800">Instal Aplikasi di Tablet / HP / Laptop</h4>
+                                    <p class="text-sm text-slate-500">Jalankan aplikasi ini dalam mode layar penuh (standalone) pada Chrome & Microsoft Edge.</p>
                                 </div>
                             </div>
-                            <button id="pwa-install-btn-dashboard" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition">
-                                Pasang Sekarang
+                            <button id="pwa-install-btn-dashboard" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-download"></i> Pasang Sekarang
                             </button>
                         </div>
 
@@ -494,7 +518,7 @@
                         </div>
                     </section>
 
-                    <!-- TAB: KEPSEK & GURU (Penuh Layar) -->
+                    <!-- TAB: KEPSEK & GURU -->
                     <section id="tab-kepsek-guru" class="tab-content hidden space-y-6">
                         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 md:p-8 w-full">
                             <div class="border-b border-slate-100 pb-4 mb-6">
@@ -519,7 +543,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-2">
                                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Guru Mata Pelajaran</label>
-                                        <input type="text" id="profile-guru" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition" required placeholder="Budi Santoso, S.Pd.">
+                                        <input type="text" id="profile-guru" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition" required placeholder="YESI PUTRI, S.Pd">
                                     </div>
                                     <div class="space-y-2">
                                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">NIP Guru Mata Pelajaran</label>
@@ -536,7 +560,7 @@
                         </div>
                     </section>
 
-                    <!-- TAB: MATA PELAJARAN (Penuh Layar) -->
+                    <!-- TAB: MATA PELAJARAN -->
                     <section id="tab-mapel" class="tab-content hidden space-y-6">
                         <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm w-full">
                             <p class="text-sm text-slate-500">Kelola daftar mata pelajaran yang Anda ajarkan di kelas.</p>
@@ -565,7 +589,7 @@
                         </div>
                     </section>
 
-                    <!-- TAB: KATEGORI PENILAIAN (Penuh Layar) -->
+                    <!-- TAB: KATEGORI PENILAIAN -->
                     <section id="tab-kategori-penilaian" class="tab-content hidden space-y-6">
                         <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm w-full">
                             <p class="text-sm text-slate-500">Buat klasifikasi komponen nilai (misalnya: Tugas, UH, UTS, UAS).</p>
@@ -594,7 +618,7 @@
                         </div>
                     </section>
 
-                    <!-- TAB: TAHUN PELAJARAN (Penuh Layar) -->
+                    <!-- TAB: TAHUN PELAJARAN -->
                     <section id="tab-tahun-pelajaran" class="tab-content hidden space-y-6">
                         <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200/80 shadow-sm w-full">
                             <p class="text-sm text-slate-500">Kelola tahun ajaran aktif guna penyortiran data kelas tahunan.</p>
@@ -793,11 +817,19 @@
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-4 gap-4">
                                 <div>
                                     <h3 class="font-poppins font-semibold text-lg text-slate-800">Daftar Kehadiran Siswa Harian</h3>
-                                    <p class="text-xs text-slate-400">Pengisian absen kolektif per hari pelajaran.</p>
+                                    <p class="text-xs text-slate-400">Pengisian absen kolektif per hari pelajaran atau menggunakan Scanner QR Code.</p>
                                 </div>
-                                <button onclick="printLembarAbsen()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
-                                    <i class="fa-solid fa-print"></i> Cetak Lembar Absen
-                                </button>
+                                <div class="flex flex-wrap gap-2">
+                                    <button onclick="openQRScannerModal()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition shadow-md">
+                                        <i class="fa-solid fa-qrcode text-sm"></i> Absen Pakai QR Code / Kamera
+                                    </button>
+                                    <button onclick="printKartuQRSiswa()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 transition shadow-md">
+                                        <i class="fa-solid fa-id-card text-sm"></i> Cetak Kartu QR Siswa
+                                    </button>
+                                    <button onclick="printLembarAbsen()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition">
+                                        <i class="fa-solid fa-print"></i> Cetak Lembar Absen
+                                    </button>
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
@@ -1070,7 +1102,7 @@
                             <div class="space-y-1">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filter Semester</label>
                                 <select id="filter-kisi-semester" onchange="renderKisiKisiTable()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none">
-                                    <option value="Semall">Semua Semester</option>
+                                    <option value="Semua">Semua Semester</option>
                                     <option value="Semester 1">Semester 1</option>
                                     <option value="Semester 2">Semester 2</option>
                                 </select>
@@ -1124,7 +1156,7 @@
                         </div>
                     </section>
 
-                    <!-- TAB: KOP SURAT (Penuh Layar) -->
+                    <!-- TAB: KOP SURAT -->
                     <section id="tab-kop-surat" class="tab-content hidden space-y-6">
                         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 md:p-8 w-full">
                             <div class="border-b border-slate-100 pb-4 mb-6">
@@ -1186,7 +1218,7 @@
                         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 md:p-8 w-full">
                             <div class="border-b border-slate-100 pb-4 mb-6">
                                 <h3 class="font-poppins font-semibold text-lg text-slate-800">Unggah Tanda Tangan Digital (TTD)</h3>
-                                <p class="text-xs text-slate-400">Masukkan URL gambar tanda tangan transparan (.png) untuk otomatisasi validasi cetak, Atau Silakan Masuk Ke Link : https://freeimage.host/appapp Untuk Mengambil URL Gambar.</p>
+                                <p class="text-xs text-slate-400">Masukkan URL gambar tanda tangan transparan (.png) untuk otomatisasi validasi cetak, atau gunakan layanan hosting gambar gratis.</p>
                             </div>
 
                             <form onsubmit="saveTTD(event)" class="space-y-6">
@@ -1237,8 +1269,8 @@
                     <section id="tab-integrasi-sheets" class="tab-content hidden space-y-6">
                         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 md:p-8 w-full space-y-6">
                             <div class="border-b border-slate-100 pb-4">
-                                <h3 class="font-poppins font-semibold text-lg text-slate-800"></h3>
-                                <p class="text-xs text-slate-400"></p>
+                                <h3 class="font-poppins font-semibold text-lg text-slate-800">Singkronisasi & Tarik Data Google Sheets</h3>
+                                <p class="text-xs text-slate-400">Hubungkan database aplikasi dengan Google Sheets secara online real-time.</p>
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1246,18 +1278,18 @@
                                 <div class="md:col-span-2 space-y-4">
                                     <div class="p-4 bg-blue-50 border border-blue-100 rounded-2xl flex items-center justify-between">
                                         <div class="flex items-center space-x-3">
-                                            <div id="sync-status-icon" class="p-2 bg-amber-500 rounded-full text-white animate-pulse">
+                                            <div id="sync-status-icon" class="p-2 bg-amber-500 rounded-full text-white">
                                                 <i class="fa-solid fa-triangle-exclamation"></i>
                                             </div>
                                             <div>
-                                                <h4 id="sync-status-text" class="font-bold text-slate-800">Tergantung di Awan (Koneksi Belum Aktif)</h4>
-                                                <p class="text-xs text-slate-500"></p>
+                                                <h4 id="sync-status-text" class="font-bold text-slate-800">Koneksi Belum Ditentukan</h4>
+                                                <p class="text-xs text-slate-500">Status sinkronisasi cloud real-time</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="space-y-2">
-                                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Informasi : Jangan di Hapus Link Dibawah Ini!</label>
+                                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Informasi : Jangan Dihapus Link Dibawah Ini!</label>
                                         <input type="url" id="google-sheets-url" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition text-sm font-mono" placeholder="https://script.google.com/macros/s/.../exec">
                                     </div>
 
@@ -1269,7 +1301,7 @@
                                             <i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data
                                         </button>
                                         <button onclick="pushToSheets()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition flex items-center gap-1.5">
-                                            <i class="fa-solid fa-cloud-arrow-up"></i> Kirim Data ke Databae
+                                            <i class="fa-solid fa-cloud-arrow-up"></i> Kirim Data ke Database
                                         </button>
                                     </div>
                                 </div>
@@ -1280,10 +1312,10 @@
                                         <i class="fa-solid fa-circle-info text-brand-600"></i> Fungsi Aplikasi Administrasi Guru : 
                                     </h4>
                                     <ol class="list-decimal list-inside space-y-2">
-                                        <li>Manajemen Penilaian: Mengolah, merekap, dan menghitung nilai siswa secara otomatis untuk penyusunan laporan hasil belajar..</li>
+                                        <li>Manajemen Penilaian: Mengolah, merekap, dan menghitung nilai siswa secara otomatis untuk penyusunan laporan hasil belajar.</li>
                                         <li>Presensi Kehadiran: Mencatat dan memantau kehadiran siswa secara real-time.</li>
-                                        <li>Jurnal Mengajar: Membuat Jurnal Mengajar dengan Mudah.</strong>.</li>
-                                        <li>Kisi-Kisi Soal: Membuat Kisi-Kisi Soal dengan Cepat.</strong> lalu terapkan.</li>
+                                        <li>Jurnal Mengajar: Membuat Jurnal Mengajar dengan Mudah.</li>
+                                        <li>Kisi-Kisi Soal: Membuat Kisi-Kisi Soal dengan Cepat.</li>
                                         <li>Pengelolaan Tugas dan Ujian: Mendistribusikan tugas dan mengelola soal untuk ulangan harian secara digital.</li>
                                         <li>Penyimpanan Data Terpusat: Menyimpan semua dokumen, materi, dan data siswa di cloud, sehingga lebih aman dan mudah diakses kapan saja.</li>
                                     </ol>
@@ -1294,6 +1326,40 @@
 
                 </div>
             </main>
+
+            <!-- NAVBAR BOTTOM UNTUK TAMPILAN MOBILE (ANDROID / IOS / WHATSAPP STYLE) -->
+            <nav id="mobile-bottom-nav" class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 md:hidden flex justify-around items-end px-2 py-2 mobile-nav-shadow pb-safe">
+                <!-- Tab Beranda -->
+                <button onclick="switchTab('beranda')" id="m-btn-beranda" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-brand-600 font-bold transition-all">
+                    <i class="fa-solid fa-house text-lg mb-0.5"></i>
+                    <span class="text-[10px] tracking-tight">Beranda</span>
+                </button>
+
+                <!-- Tab Data Siswa -->
+                <button onclick="switchTab('data-siswa')" id="m-btn-data-siswa" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 font-normal transition-all">
+                    <i class="fa-solid fa-user-group text-lg mb-0.5"></i>
+                    <span class="text-[10px] tracking-tight">Siswa</span>
+                </button>
+
+                <!-- Tombol Center Akses Langsung Scanner QR Code (Style Tombol Utama WhatsApp) -->
+                <div class="flex-1 flex justify-center items-center -mt-5 relative z-10">
+                    <button onclick="openQRScannerModal()" class="w-13 h-13 bg-gradient-to-tr from-brand-700 to-brand-500 text-white rounded-full flex flex-col items-center justify-center shadow-lg shadow-brand-600/40 border-4 border-slate-50 active:scale-90 hover:scale-105 transition-all">
+                        <i class="fa-solid fa-qrcode text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Tab Absensi -->
+                <button onclick="switchTab('absensi')" id="m-btn-absensi" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 font-normal transition-all">
+                    <i class="fa-solid fa-clipboard-user text-lg mb-0.5"></i>
+                    <span class="text-[10px] tracking-tight">Absensi</span>
+                </button>
+
+                <!-- Tombol Keluar Sesi Style iOS/Android -->
+                <button onclick="handleLogout()" id="m-btn-keluar" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-rose-500 font-normal transition-all">
+                    <i class="fa-solid fa-right-from-bracket text-lg mb-0.5"></i>
+                    <span class="text-[10px] tracking-tight">Keluar</span>
+                </button>
+            </nav>
         </div>
     </div>
 
@@ -1361,7 +1427,7 @@
                 <form id="form-mapel-modal" class="hidden space-y-4">
                     <div class="space-y-2">
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Nama Mata Pelajaran</label>
-                        <input type="text" id="mapel-nama" required placeholder="Contoh: Matematika, Agama Islam" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
+                        <input type="text" id="mapel-nama" required placeholder="Contoh: English, Matematika" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition">
                     </div>
                 </form>
 
@@ -1409,7 +1475,7 @@
                         </div>
                         <div class="space-y-2 sm:col-span-2">
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Materi Pembelajaran</label>
-                            <input type="text" id="jurnal-materi" required placeholder="Contoh: Mengenal pecahan dasar" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-xs transition">
+                            <input type="text" id="jurnal-materi" required placeholder="Contoh: Greeting & Introduction (Kelas 1)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-xs transition">
                         </div>
                         <div class="space-y-2 sm:col-span-2">
                             <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Rincian Kegiatan Mengajar</label>
@@ -1472,7 +1538,7 @@
         </div>
     </div>
 
-    <!-- CUSTOM CONFIRMATION DIALOG MODAL (Aman dari native browser block) -->
+    <!-- CUSTOM CONFIRMATION DIALOG MODAL -->
     <div id="confirm-modal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden">
         <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden p-6 text-center space-y-4 transform scale-95 transition-all">
             <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto text-xl">
@@ -1487,6 +1553,124 @@
         </div>
     </div>
 
+    <!-- MODAL PANDUAN INSTALASI IOS (IPHONE / IPAD) -->
+    <div id="ios-install-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden p-6 text-center space-y-5 transform transition-all border border-slate-100">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+                <div class="flex items-center space-x-2 text-slate-800 font-poppins font-bold text-sm">
+                    <i class="fa-brands fa-apple text-xl text-slate-900"></i>
+                    <span>Instal di iPhone / iPad</span>
+                </div>
+                <button onclick="closeIosInstallModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center justify-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                <img src="https://iili.io/CHemQQ1.th.png" alt="App Icon" class="w-12 h-12 rounded-xl object-cover shadow-sm border border-white">
+                <div class="text-left">
+                    <h4 class="font-bold text-slate-800 text-xs">YESI PUTRI, S.Pd</h4>
+                    <p class="text-[10px] text-slate-500">ADM Guru BHS. Inggris</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 text-left text-xs text-slate-600">
+                <p class="font-semibold text-slate-700">Ikuti langkah mudah berikut di browser Safari / Chrome iOS:</p>
+                
+                <div class="flex items-start space-x-3 bg-slate-50 p-2.5 rounded-xl">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 text-white font-bold text-xs shrink-0">1</span>
+                    <p class="leading-relaxed">Ketuk tombol <strong class="text-slate-800">Bagikan (Share)</strong> <i class="fa-solid fa-arrow-up-from-bracket text-brand-600 mx-0.5"></i> di menu bawah browser.</p>
+                </div>
+
+                <div class="flex items-start space-x-3 bg-slate-50 p-2.5 rounded-xl">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 text-white font-bold text-xs shrink-0">2</span>
+                    <p class="leading-relaxed">Gulir ke bawah lalu pilih <strong class="text-slate-800">'Tambah ke Layar Utama'</strong> <i class="fa-regular fa-square-plus text-brand-600 mx-0.5"></i>.</p>
+                </div>
+
+                <div class="flex items-start space-x-3 bg-slate-50 p-2.5 rounded-xl">
+                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-brand-600 text-white font-bold text-xs shrink-0">3</span>
+                    <p class="leading-relaxed">Ketuk <strong class="text-slate-800">'Tambah' (Add)</strong> di pojok kanan atas. Foto Guru akan langsung tampil di layar utama iPhone Anda!</p>
+                </div>
+            </div>
+
+            <button onclick="closeIosInstallModal()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold rounded-xl shadow-md transition">
+                Saya Mengerti
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL NOTIFIKASI LOGIN & SINKRONISASI 1%-100% -->
+    <div id="login-loading-modal" class="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden p-8 text-center space-y-6 transform transition-all border border-slate-100">
+            <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
+                <!-- Circular Progress Bar -->
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path class="text-slate-100" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="login-progress-circle" class="text-brand-600 transition-all duration-200 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <div class="absolute flex flex-col items-center justify-center">
+                    <span id="login-progress-percent" class="font-poppins font-bold text-2xl text-slate-800">0%</span>
+                </div>
+            </div>
+            <p id="login-progress-status" class="text-xs font-semibold text-slate-500">Memuat Data...</p>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div id="login-progress-bar" class="bg-brand-600 h-full w-0 transition-all duration-200"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SCANNER QR CODE ABSENSI SISWA -->
+    <div id="qr-scanner-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden p-6 space-y-4 border border-slate-100 relative">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div class="flex items-center space-x-2 text-slate-800 font-poppins font-bold text-base">
+                    <i class="fa-solid fa-qrcode text-brand-600 text-xl"></i>
+                    <span>Scan QR Absensi Siswa</span>
+                </div>
+                <button onclick="stopQRScanner()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Controls: Status & Switch Camera -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-500 mb-1">Status Kehadiran</label>
+                    <select id="qr-status-mode" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none">
+                        <option value="Hadir" selected>🟢 Hadir</option>
+                        <option value="Izin">🔵 Izin</option>
+                        <option value="Sakit">🟡 Sakit</option>
+                        <option value="Alpa">🔴 Alpa</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-500 mb-1">Pilih Kamera (Kamera Depan / Belakang)</label>
+                    <select id="qr-camera-select" onchange="switchQRCamera(this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none">
+                        <option value="">Memuat Kamera...</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Video Frame Container -->
+            <div class="relative w-full rounded-2xl overflow-hidden bg-slate-900 border-2 border-brand-500 shadow-inner min-h-[260px] flex items-center justify-center">
+                <div id="qr-reader" class="w-full"></div>
+            </div>
+
+            <!-- Visual Feedback Hasil Scan -->
+            <div id="qr-scan-result" class="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl hidden text-xs font-semibold flex items-center gap-2">
+                <!-- Dynamic Scan Feedback -->
+            </div>
+
+            <div class="text-[11px] text-slate-400 text-center leading-relaxed">
+                Arahkan kamera ke QR Code Kartu Siswa (NISN/Nama). Siswa akan otomatis tercatat di kelas aktif.
+            </div>
+
+            <button onclick="stopQRScanner()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
+                Tutup Scanner
+            </button>
+        </div>
+    </div>
+
     <!-- Toast Notification Box -->
     <div id="toast" class="fixed bottom-6 right-6 z-[200] max-w-sm bg-slate-900 text-white py-3 px-5 rounded-xl shadow-2xl flex items-center space-x-3 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none">
         <div id="toast-icon" class="text-emerald-400">
@@ -1498,7 +1682,7 @@
     <script>
         let appData = {
             siswa: [],
-            profile: { kepsek: '', nipKepsek: '', guru: '', nipGuru: '' },
+            profile: { kepsek: '', nipKepsek: '', guru: 'YESI PUTRI, S.Pd', nipGuru: '' },
             mapel: [],
             kategori: [],
             tahun: [],
@@ -1513,10 +1697,15 @@
         let currentModalTarget = '';
         let currentEditId = null;
 
+        // Variables for QR Code Scanner
+        let html5QrcodeScanner = null;
+        let currentCameraId = null;
+        let lastScannedCode = null;
+        let lastScanTime = 0;
+
         // URL Google Sheets Default
         const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycby6Ytq1hTjCahmNG8vJb8ifmorJAuas_M_h7ZhFeu2TBaMMEaL-ZRog5hrlscoXMcSsSw/exec";
 
-        // Callback confirm modal handler
         let confirmCallback = null;
 
         window.onload = function() {
@@ -1525,6 +1714,229 @@
             checkLoginSession();
             initPWA();
         };
+        // QR CODE SCANNER FUNCTIONS
+        async function openQRScannerModal() {
+            let kelas = document.getElementById('absen-kelas').value;
+            if (!kelas) {
+                const classSelect = document.getElementById('absen-kelas');
+                if (classSelect.options.length > 1) {
+                    classSelect.selectedIndex = 1;
+                    kelas = classSelect.value;
+                    loadStudentCollectiveAbsen();
+                    showToast(`Otomatis memilih ${kelas}. Anda dapat memilih kelas lain di dropdown.`);
+                }
+            }
+
+            document.getElementById('qr-scanner-modal').classList.remove('hidden');
+            const resultBox = document.getElementById('qr-scan-result');
+            resultBox.classList.add('hidden');
+
+            try {
+                const devices = await Html5Qrcode.getCameras();
+                const select = document.getElementById('qr-camera-select');
+                select.innerHTML = '';
+
+                if (devices && devices.length > 0) {
+                    devices.forEach((device, index) => {
+                        const opt = document.createElement('option');
+                        opt.value = device.id;
+                        let label = device.label || `Kamera ${index + 1}`;
+                        if (label.toLowerCase().includes('back') || label.toLowerCase().includes('belakang') || index === 0) {
+                            label = `📷 Kamera Belakang (${label})`;
+                        } else if (label.toLowerCase().includes('front') || label.toLowerCase().includes('depan')) {
+                            label = `🤳 Kamera Depan (${label})`;
+                        }
+                        opt.textContent = label;
+                        select.appendChild(opt);
+                    });
+
+                    let backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('belakang'));
+                    currentCameraId = backCam ? backCam.id : devices[0].id;
+                    select.value = currentCameraId;
+
+                    startQRCamera(currentCameraId);
+                } else {
+                    startQRCamera(null);
+                }
+            } catch (err) {
+                console.warn("Kamera tidak dapat terdaftar, menggunakan kamera default:", err);
+                startQRCamera(null);
+            }
+        }
+
+        async function startQRCamera(cameraId) {
+            if (html5QrcodeScanner) {
+                try {
+                    await html5QrcodeScanner.stop();
+                } catch (e) {}
+            }
+
+            html5QrcodeScanner = new Html5Qrcode("qr-reader");
+            const config = { fps: 10, qrbox: { width: 220, height: 220 } };
+
+            try {
+                if (cameraId) {
+                    await html5QrcodeScanner.start(cameraId, config, onQRCodeScanned, () => {});
+                } else {
+                    await html5QrcodeScanner.start({ facingMode: "environment" }, config, onQRCodeScanned, () => {});
+                }
+            } catch (err) {
+                console.error("Error membuka kamera utama:", err);
+                try {
+                    await html5QrcodeScanner.start({ facingMode: "user" }, config, onQRCodeScanned, () => {});
+                } catch (err2) {
+                    showToast('Gagal membuka kamera. Pastikan izin kamera telah diberikan di peramban Anda!', false);
+                }
+            }
+        }
+
+        async function switchQRCamera(cameraId) {
+            currentCameraId = cameraId;
+            await startQRCamera(cameraId);
+        }
+
+        function stopQRScanner() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.stop().then(() => {
+                    html5QrcodeScanner.clear();
+                    html5QrcodeScanner = null;
+                }).catch(err => {
+                    console.error("Error menghentikan scanner:", err);
+                });
+            }
+            document.getElementById('qr-scanner-modal').classList.add('hidden');
+        }
+
+        function onQRCodeScanned(decodedText) {
+            const now = Date.now();
+            if (lastScannedCode === decodedText && (now - lastScanTime) < 2500) {
+                return;
+            }
+
+            lastScannedCode = decodedText;
+            lastScanTime = now;
+
+            const cleanText = decodedText.trim();
+            const student = appData.siswa.find(s => 
+                s.nis.trim() === cleanText || 
+                s.nama.toLowerCase().trim() === cleanText.toLowerCase() || 
+                String(s.id) === cleanText
+            );
+
+            const resultBox = document.getElementById('qr-scan-result');
+
+            if (!student) {
+                resultBox.className = "p-3 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl text-xs font-semibold flex items-center gap-2";
+                resultBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i> Kode "<b>${cleanText}</b>" tidak terdaftar di database siswa!`;
+                resultBox.classList.remove('hidden');
+                return;
+            }
+
+            let kelas = document.getElementById('absen-kelas').value;
+            if (!kelas || kelas !== student.kelas) {
+                const classSelect = document.getElementById('absen-kelas');
+                classSelect.value = student.kelas;
+                kelas = student.kelas;
+                loadStudentCollectiveAbsen();
+            }
+
+            const mapel = document.getElementById('absen-mapel').value;
+            let tanggal = document.getElementById('absen-tanggal').value;
+            if (!tanggal) {
+                tanggal = new Date().toISOString().split('T')[0];
+                document.getElementById('absen-tanggal').value = tanggal;
+            }
+
+            const statusMode = document.getElementById('qr-status-mode').value || 'Hadir';
+
+            appData.absensi = appData.absensi.filter(a => 
+                !(a.siswaNama === student.nama && a.kelas === kelas && 
+                  a.mapel === mapel && convertToISODate(a.tanggal) === convertToISODate(tanggal))
+            );
+
+            appData.absensi.push({
+                id: Date.now() + Math.random(),
+                tanggal, siswaNama: student.nama, kelas, nis: student.nis, mapel, status: statusMode, keterangan: statusMode === 'Hadir' ? '' : 'Absen via QR Code'
+            });
+
+            saveStorage();
+            loadStudentCollectiveAbsen();
+            renderAbsensiRecapTable();
+            renderTotalAbsenTable();
+
+            resultBox.className = "p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-semibold flex items-center gap-2";
+            resultBox.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600 text-base"></i> <b>${student.nama}</b> (${student.kelas}) ➔ Status: <span class="uppercase tracking-wider font-bold text-emerald-700">${statusMode}</span>`;
+            resultBox.classList.remove('hidden');
+
+            showToast(`Absen QR Berhasil: ${student.nama} (${statusMode})`);
+        }
+
+        function printKartuQRSiswa() {
+            let kelas = document.getElementById('absen-kelas').value;
+            if (!kelas) {
+                const classSelect = document.getElementById('absen-kelas');
+                if (classSelect.options.length > 1) {
+                    classSelect.selectedIndex = 1;
+                    kelas = classSelect.value;
+                } else {
+                    showToast('Pilih kelas terlebih dahulu atau tambahkan data siswa!', false);
+                    return;
+                }
+            }
+
+            const filteredSiswa = appData.siswa.filter(s => s.kelas === kelas);
+
+            if (filteredSiswa.length === 0) {
+                showToast(`Tidak ada siswa terdaftar di ${kelas}`, false);
+                return;
+            }
+
+            const printWin = window.open('', '_blank');
+            if (!printWin) {
+                showToast('Pop-up terblokir! Izinkan pop-up di peramban Anda.', false);
+                return;
+            }
+
+            let cardsHTML = '';
+            filteredSiswa.forEach(s => {
+                const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(s.nis)}`;
+                cardsHTML += `
+                    <div style="border: 2px solid #0273c4; border-radius: 12px; padding: 15px; width: 200px; text-align: center; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.1); page-break-inside: avoid; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+                        <div style="border-bottom: 2px solid #e2e8f0; width: 100%; padding-bottom: 6px; margin-bottom: 8px;">
+                            <h4 style="margin: 0; font-size: 11px; color: #0273c4; text-transform: uppercase; font-weight: bold; font-family: sans-serif;">KARTU ABSENSI QR SISWA</h4>
+                            <p style="margin: 2px 0 0 0; font-size: 10px; color: #64748b; font-family: sans-serif; font-weight: bold;">${s.kelas}</p>
+                        </div>
+                        <img src="${qrUrl}" alt="QR Code" style="width: 120px; height: 120px; margin: 6px 0; border: 1px solid #f1f5f9; padding: 4px; border-radius: 8px;">
+                        <div style="width: 100%; margin-top: 6px; font-family: sans-serif;">
+                            <p style="margin: 0; font-size: 12px; font-weight: bold; color: #0f172a;">${s.nama}</p>
+                            <p style="margin: 2px 0 0 0; font-size: 10px; font-family: monospace; color: #475569; font-weight: bold;">NISN: ${s.nis}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const doc = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Cetak Kartu QR Siswa — ${kelas}</title>
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; background: #f8fafc; }
+                        .grid-cards { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+                        .btn-print { background: #0273c4; color: white; padding: 10px 20px; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 20px; font-size: 13px; }
+                        @media print { .btn-print { display: none !important; } body { padding: 0; background: #fff; } }
+                    </style>
+                </head>
+                <body>
+                    <button class="btn-print" onclick="window.print()">🖨️ Cetak Semua Kartu QR (${kelas})</button>
+                    <div class="grid-cards">${cardsHTML}</div>
+                </body>
+                </html>
+            `;
+
+            printWin.document.write(doc);
+            printWin.document.close();
+        }
 
         function getSheetsUrl() {
             let storedUrl = localStorage.getItem('ad_guru_sheets_url');
@@ -1544,18 +1956,12 @@
             }
         }
 
-        // Screen transition utilities
         function showMainApp() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             switchTab('beranda');
             updateDashboardStats();
             renderAllTables();
-            
-            // Sync dari cloud Google Sheet saat halaman pertama kali termuat
-            setTimeout(() => {
-                pullFromSheets(true); 
-            }, 1000);
         }
 
         function showLoginScreen() {
@@ -1587,11 +1993,56 @@
                 sessionStorage.setItem('ad_guru_logged_in', 'true');
                 document.getElementById('username').value = '';
                 document.getElementById('password').value = '';
-                showMainApp();
-                showToast('Selamat Datang! Yesi Putri, S.Pd.');
+                startLoginWithSyncProcess();
             } else {
                 errorBox.classList.remove('hidden');
             }
+        }
+
+        async function startLoginWithSyncProcess() {
+            const modal = document.getElementById('login-loading-modal');
+            const percentText = document.getElementById('login-progress-percent');
+            const statusText = document.getElementById('login-progress-status');
+            const circlePath = document.getElementById('login-progress-circle');
+            const progressBar = document.getElementById('login-progress-bar');
+
+            if (modal) modal.classList.remove('hidden');
+
+            function updateUI(p, statusMsg) {
+                if (percentText) percentText.textContent = `${p}%`;
+                if (circlePath) circlePath.setAttribute('stroke-dasharray', `${p}, 100`);
+                if (progressBar) progressBar.style.width = `${p}%`;
+                if (statusMsg && statusText) statusText.textContent = statusMsg;
+            }
+
+            updateUI(5, 'Menghubungkan ke Google Sheets...');
+
+            // Jalankan pengambilan data cloud Google Sheets secara riil
+            const syncPromise = pullFromSheets(true).catch(() => {});
+
+            // Animasi peningkatan persentase secara halus dari 5% sampai 90%
+            for (let i = 5; i <= 90; i += Math.floor(Math.random() * 4) + 3) {
+                let statusMsg = 'Menghubungkan ke Google Sheets...';
+                if (i >= 35 && i < 70) {
+                    statusMsg = 'Mengunduh Data Siswa & Nilai...';
+                } else if (i >= 70) {
+                    statusMsg = 'Menyiapkan Lembar Kerja Administrasi...';
+                }
+                updateUI(i, statusMsg);
+                await new Promise(r => setTimeout(r, 45));
+            }
+
+            // Tunggu hingga respon dari Google Sheets selesai
+            await syncPromise;
+
+            // Genapkan progres hingga 100%
+            updateUI(100, 'Data Berhasil Dimuat!');
+            await new Promise(r => setTimeout(r, 350));
+
+            // Sembunyikan modal notifikasi & buka aplikasi utama
+            if (modal) modal.classList.add('hidden');
+            showMainApp();
+            showToast('Selamat Datang! YESI PUTRI, S.Pd.');
         }
 
         function handleLogout() {
@@ -1602,7 +2053,7 @@
 
         function saveStorage() {
             localStorage.setItem('ad_guru_data', JSON.stringify(appData));
-            pushToSheets(); // Kirim data real-time ke Google Sheet
+            pushToSheets();
         }
 
         function loadStorage() {
@@ -1618,7 +2069,7 @@
 
         function initializeDefaultData() {
             if (!appData.siswa) appData.siswa = [];
-            if (!appData.profile) appData.profile = { kepsek: '', nipKepsek: '', guru: '', nipGuru: '' };
+            if (!appData.profile) appData.profile = { kepsek: '', nipKepsek: '', guru: 'YESI PUTRI, S.Pd', nipGuru: '' };
             if (!appData.mapel) appData.mapel = [];
             if (!appData.kategori) appData.kategori = [];
             if (!appData.tahun) appData.tahun = [];
@@ -1632,13 +2083,30 @@
             document.getElementById('google-sheets-url').value = getSheetsUrl();
         }
 
-        // PWA Implementation
         let deferredPrompt;
+        function isIOSDevice() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        function showIosInstallModal() {
+            document.getElementById('ios-install-modal').classList.remove('hidden');
+        }
+
+        function closeIosInstallModal() {
+            document.getElementById('ios-install-modal').classList.add('hidden');
+        }
+
         function initPWA() {
-            // Register Service Worker dynamically
+            // Un-hide install buttons by default so user can install directly on Chrome & Edge
+            const installBtnSidebar = document.getElementById('pwa-install-btn');
+            const installBanner = document.getElementById('pwa-dashboard-banner');
+            if (installBtnSidebar) installBtnSidebar.classList.remove('hidden');
+            if (installBanner) installBanner.classList.remove('hidden');
+
             if ('serviceWorker' in navigator) {
                 const swCode = `
                     self.addEventListener('install', e => self.skipWaiting());
+                    self.addEventListener('activate', e => self.clients.claim());
                     self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
                 `;
                 const blob = new Blob([swCode], {type: 'application/javascript'});
@@ -1649,34 +2117,36 @@
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
-                
-                // Show installation UI banners
-                document.getElementById('pwa-install-btn').classList.remove('hidden');
-                document.getElementById('pwa-dashboard-banner').classList.remove('hidden');
             });
 
             const installAction = async () => {
-                if (!deferredPrompt) return;
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('pwa-install-btn').classList.add('hidden');
-                    document.getElementById('pwa-dashboard-banner').classList.add('hidden');
+                if (isIOSDevice()) {
+                    showIosInstallModal();
+                    return;
                 }
-                deferredPrompt = null;
+
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        showToast('Aplikasi PWA berhasil terpasang!');
+                    }
+                    deferredPrompt = null;
+                } else {
+                    showToast('Untuk menginstal di Chrome/Edge: Buka menu browser (⋮) -> pilih "Instal Aplikasi" atau "Tambahkan ke Layar Utama".', false);
+                }
             };
 
-            document.getElementById('pwa-install-btn').addEventListener('click', installAction);
-            document.getElementById('pwa-install-btn-dashboard').addEventListener('click', installAction);
+            const btnSidebar = document.getElementById('pwa-install-btn');
+            const btnDashboard = document.getElementById('pwa-install-btn-dashboard');
+            if (btnSidebar) btnSidebar.onclick = installAction;
+            if (btnDashboard) btnDashboard.onclick = installAction;
         }
 
-        // Penerjemah tanggal dari "24 Mei 2026" kembali menjadi format ISO standard "2026-05-24"
         function convertToISODate(dateStr) {
             if (!dateStr) return '';
             let str = String(dateStr).trim();
-            if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
-                return str;
-            }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
             const months = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
             const shortMonths = ["jan", "feb", "mar", "apr", "mei", "jun", "jul", "agu", "sep", "okt", "nov", "des"];
             let parts = str.split(' ');
@@ -1684,18 +2154,14 @@
                 let day = String(parts[0]).padStart(2, '0');
                 let monthStr = parts[1].toLowerCase();
                 let monthIdx = months.indexOf(monthStr);
-                if (monthIdx === -1) {
-                    monthIdx = shortMonths.indexOf(monthStr);
-                }
+                if (monthIdx === -1) monthIdx = shortMonths.indexOf(monthStr);
                 if (monthIdx !== -1) {
                     let month = String(monthIdx + 1).padStart(2, '0');
                     let year = parts[2];
                     return year + "-" + month + "-" + day;
                 }
             }
-            if (str.indexOf('T') !== -1) {
-                return str.split('T')[0];
-            }
+            if (str.indexOf('T') !== -1) return str.split('T')[0];
             let d = new Date(str);
             if (!isNaN(d.getTime())) {
                 let yyyy = d.getFullYear();
@@ -1710,18 +2176,13 @@
             if (!dateStr) return new Date();
             const iso = convertToISODate(dateStr);
             const d = new Date(iso);
-            if (isNaN(d.getTime())) {
-                return new Date();
-            }
-            return d;
+            return isNaN(d.getTime()) ? new Date() : d;
         }
 
         function formatTanggal(dateStr) {
             if (!dateStr) return '';
             const str = String(dateStr).trim();
-            if (isNaN(Date.parse(str)) && str.split(' ').length === 3) {
-                return str; 
-            }
+            if (isNaN(Date.parse(str)) && str.split(' ').length === 3) return str;
             const iso = convertToISODate(str);
             const d = new Date(iso);
             if (isNaN(d.getTime())) return dateStr;
@@ -1729,17 +2190,16 @@
             return d.toLocaleDateString('id-ID', options);
         }
 
-        // Integrasi Real-Time dengan Google Sheets Cloud
         async function pushToSheets() {
             const url = getSheetsUrl();
-            if (!url || url === DEFAULT_SHEETS_URL && !localStorage.getItem('ad_guru_sheets_connected')) {
+            if (!url || (url === DEFAULT_SHEETS_URL && !localStorage.getItem('ad_guru_sheets_connected'))) {
                 updateSyncStatus('disconnected');
                 return;
             }
 
             updateSyncStatus('uploading');
             try {
-                const response = await fetch(url, {
+                await fetch(url, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
@@ -1763,12 +2223,10 @@
                 const data = await response.json();
                 
                 if (data && typeof data === 'object') {
-                    // Proteksi Anti-Wipe / Data Kehilangan
                     const cloudRecordCount = countRecords(data);
                     const localRecordCount = countRecords(appData);
 
                     if (cloudRecordCount === 0 && localRecordCount > 0) {
-                        // Google Sheets Kosong, Save Data Lokal ke Cloud
                         updateSyncStatus('uploading');
                         await fetch(url, {
                             method: 'POST',
@@ -1780,7 +2238,6 @@
                         return;
                     }
 
-                    // Buat Backup Darurat Lokal sebelum menimpa
                     localStorage.setItem('ad_guru_data_safety_backup', JSON.stringify(appData));
                     
                     appData = data;
@@ -1850,7 +2307,6 @@
             pullFromSheets();
         }
 
-        // Sidebar Navigation
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('-translate-x-full');
@@ -1862,6 +2318,7 @@
             });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
 
+            // Desktop Sidebar Highlighting
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('bg-brand-800', 'text-white', 'shadow-md');
                 btn.classList.add('text-brand-100', 'hover:bg-brand-800/50', 'hover:text-white');
@@ -1871,6 +2328,19 @@
             if (activeBtn) {
                 activeBtn.classList.remove('text-brand-100', 'hover:bg-brand-800/50', 'hover:text-white');
                 activeBtn.classList.add('bg-brand-800', 'text-white', 'shadow-md');
+            }
+
+            // Mobile Bottom Navigation Highlighting (iOS / Android Style)
+            document.querySelectorAll('.mobile-nav-btn').forEach(mBtn => {
+                if (mBtn.id !== 'm-btn-keluar') {
+                    mBtn.classList.remove('text-brand-600', 'font-bold');
+                    mBtn.classList.add('text-slate-400', 'font-normal');
+                }
+            });
+            const activeMobileBtn = document.getElementById(`m-btn-${tabId}`);
+            if (activeMobileBtn && activeMobileBtn.id !== 'm-btn-keluar') {
+                activeMobileBtn.classList.remove('text-slate-400', 'font-normal');
+                activeMobileBtn.classList.add('text-brand-600', 'font-bold');
             }
 
             const pageTitles = {
@@ -1916,7 +2386,6 @@
             }, 3000);
         }
 
-        // Custom Confirmation Modal
         function triggerConfirm(title, text, callback) {
             document.getElementById('confirm-title').textContent = title;
             document.getElementById('confirm-text').textContent = text;
@@ -1941,7 +2410,7 @@
                     localStorage.removeItem('ad_guru_sheets_url');
                     localStorage.removeItem('ad_guru_sheets_connected');
                     appData = {
-                        siswa: [], profile: { kepsek: '', nipKepsek: '', guru: '', nipGuru: '' },
+                        siswa: [], profile: { kepsek: '', nipKepsek: '', guru: 'YESI PUTRI, S.Pd', nipGuru: '' },
                         mapel: [], kategori: [], tahun: [], penilaian: [], absensi: [], jurnal: [], kisiKisi: [],
                         kop: { logoKiri: '', logoKanan: '', pemda: '', dinas: '', sekolah: '', kecamatan: '', alamat: '', email: '', website: '' },
                         ttd: { kepsek: '', guru: '' }
@@ -1961,21 +2430,19 @@
             const activeTahun = appData.tahun.find(t => t.aktif);
             document.getElementById('stat-tahun').textContent = activeTahun ? activeTahun.nama : '-';
 
-            // Quick Info Profile
             document.getElementById('quick-kepsek').textContent = appData.profile.kepsek || '-';
             document.getElementById('quick-nip-kepsek').textContent = appData.profile.nipKepsek || '-';
-            document.getElementById('quick-guru').textContent = appData.profile.guru || '-';
+            document.getElementById('quick-guru').textContent = appData.profile.guru || 'YESI PUTRI, S.Pd';
             document.getElementById('quick-nip-guru').textContent = appData.profile.nipGuru || '-';
 
-            // Header profile text
-            document.getElementById('header-guru-nama').textContent = appData.profile.guru || 'Guru Mapel';
+            document.getElementById('header-guru-nama').textContent = appData.profile.guru || 'YESI PUTRI, S.Pd';
             document.getElementById('header-guru-nip').textContent = appData.profile.nipGuru ? `NIP. ${appData.profile.nipGuru}` : '-';
         }
 
         function loadProfileForm() {
             document.getElementById('profile-kepsek').value = appData.profile.kepsek || '';
             document.getElementById('profile-nip-kepsek').value = appData.profile.nipKepsek || '';
-            document.getElementById('profile-guru').value = appData.profile.guru || '';
+            document.getElementById('profile-guru').value = appData.profile.guru || 'YESI PUTRI, S.Pd';
             document.getElementById('profile-nip-guru').value = appData.profile.nipGuru || '';
         }
 
@@ -2053,7 +2520,6 @@
             showToast('URL Tanda Tangan Berhasil Disimpan!');
         }
 
-        // Dropdown Synchronization
         function syncDropdowns() {
             const loadSelect = (elId, array, defaultText) => {
                 const el = document.getElementById(elId);
@@ -2093,7 +2559,6 @@
             loadSelect('filter-kisi-mapel', appData.mapel, 'Semua Mapel');
             loadSelect('filter-kisi-tahun', appData.tahun, 'Semua Tahun');
 
-            // Unique bentuk filter
             const shapes = [...new Set(appData.kisiKisi.map(k => k.bentuk))].filter(b => b);
             const shapesSelect = document.getElementById('filter-kisi-bentuk');
             if (shapesSelect) {
@@ -2107,7 +2572,6 @@
             }
         }
 
-        // Open Modal Setup
         function openAddModal(target, id = null) {
             currentModalTarget = target;
             currentEditId = id;
@@ -2297,7 +2761,12 @@
             renderAllTables();
         }
 
-        // Table Rendering
+        function filterSiswa() {
+            const query = document.getElementById('search-siswa').value.toLowerCase();
+            const filtered = appData.siswa.filter(s => s.nama.toLowerCase().includes(query) || s.nis.includes(query));
+            renderSiswaTable(filtered);
+        }
+
         function renderAllTables() {
             renderSiswaTable();
             renderMapelTable();
@@ -2528,7 +2997,6 @@
             showToast('Tahun pelajaran aktif diubah!');
         }
 
-        // Collective Penilaian Loader
         function loadStudentCollectiveNilai() {
             const kelas = document.getElementById('penilaian-kelas').value;
             const tbody = document.getElementById('table-collective-nilai-body');
@@ -2548,7 +3016,6 @@
             const semester = document.getElementById('penilaian-semester').value;
 
             filteredSiswa.forEach((siswa, idx) => {
-                // Check if score exists
                 const existing = appData.penilaian.find(p => 
                     p.siswaNama === siswa.nama && p.kelas === kelas && 
                     p.mapel === mapel && p.kategori === kategori && 
@@ -2593,7 +3060,6 @@
                 const nama = input.getAttribute('data-siswa-nama');
                 const nis = input.getAttribute('data-siswa-nis');
 
-                // Delete old if exists
                 appData.penilaian = appData.penilaian.filter(p => 
                     !(p.siswaNama === nama && p.kelas === kelas && 
                       p.mapel === mapel && p.kategori === kategori && 
@@ -2670,7 +3136,6 @@
             });
         }
 
-        // Absensi Siswa Section
         function loadStudentCollectiveAbsen() {
             const kelas = document.getElementById('absen-kelas').value;
             const tbody = document.getElementById('table-collective-absen-body');
@@ -2722,7 +3187,7 @@
                     </td>
                 `;
                 tbody.appendChild(row);
-                toggleKeteranganField(siswa.id); // Set initial state
+                toggleKeteranganField(siswa.id);
             });
         }
 
@@ -2770,13 +3235,12 @@
 
                 if ((status === 'Izin' || status === 'Sakit') && keterangan === '') {
                     isAnyError = true;
-                    ketInput.classList.add('border-rose-400', 'bg-rose-50');
+                    if (ketInput) ketInput.classList.add('border-rose-400', 'bg-rose-50');
                     return;
                 } else if (ketInput) {
                     ketInput.classList.remove('border-rose-400', 'bg-rose-50');
                 }
 
-                // Delete old matching record
                 appData.absensi = appData.absensi.filter(a => 
                     !(a.siswaNama === nama && a.kelas === kelas && 
                       a.mapel === mapel && convertToISODate(a.tanggal) === convertToISODate(tanggal))
@@ -2870,7 +3334,6 @@
             });
         }
 
-        // Total Absensi Kumulatif per Kelas
         function renderTotalAbsenTable() {
             const tbody = document.getElementById('table-total-absen-body');
             const empty = document.getElementById('total-absen-empty-state');
@@ -2919,7 +3382,6 @@
             });
         }
 
-        // Jurnal Mengajar Section
         function renderJurnalTable() {
             const tbody = document.getElementById('table-jurnal-body');
             const empty = document.getElementById('jurnal-empty-state');
@@ -2948,7 +3410,7 @@
 
             list.forEach((j, index) => {
                 const fotoHtml = j.foto ? `
-                    <div class="h-10 w-10 mx-auto rounded overflow-hidden border border-slate-200 bg-slate-50 cursor-zoom-in" onclick="window.open('${j.foto}', '_blank')">
+                    <div class="h-10 w-10 mx-auto rounded overflow-hidden border border-slate-200 bg-slate-50 cursor-pointer" onclick="window.open('${j.foto}', '_blank')">
                         <img src="${j.foto}" class="h-full w-full object-cover" onerror="this.outerHTML='<span class=\\'text-[9px] text-slate-400 font-bold\\'>Gagal</span>'">
                     </div>
                 ` : '<span class="text-slate-400 text-xs">Tidak Ada</span>';
@@ -2998,7 +3460,6 @@
             });
         }
 
-        // Kisi-Kisi Soal Section
         function renderKisiKisiTable() {
             const tbody = document.getElementById('table-kisi-body');
             const empty = document.getElementById('kisi-empty-state');
@@ -3068,7 +3529,6 @@
             });
         }
 
-        // Print and Report Mechanisms
         function openPrintWindow(title, tableHeaderHTML, tableBodyHTML) {
             const printWin = window.open('', '_blank');
             if (!printWin) {
@@ -3089,7 +3549,7 @@
 
             const kepsek = appData.profile.kepsek || "Nama Kepala Sekolah";
             const nipKepsek = appData.profile.nipKepsek || "NIP. -";
-            const guru = appData.profile.guru || "Nama Guru Mata Pelajaran";
+            const guru = appData.profile.guru || "YESI PUTRI, S.Pd";
             const nipGuru = appData.profile.nipGuru || "NIP. -";
 
             const ttdKepsekImg = appData.ttd.kepsek ? `<img src="${appData.ttd.kepsek}" style="max-height: 60px; max-width: 150px; object-fit: contain; margin: 5px 0;">` : `<div style="height: 60px;"></div>`;
@@ -3273,7 +3733,7 @@
             const kelas = document.getElementById('filter-total-absen-kelas').value;
             const filteredSiswa = appData.siswa.filter(s => s.kelas === kelas);
 
-            const header = `<tr><th class="text-center" style="width:40px;">No</th><th>Nama Siswa</th><th style="width:120px;">NISN</th><th class="text-center" style="width:80px;">Hadir</th><th class="text-center" style="width:80px;">Izin</th><th class="text-center" style="width:80px;">Sakit</th><th class="text-center" style="width:80px;">Alpa</th><th class="text-center" style="width:100px;">Persentase</th></tr>`;
+            const header = `<tr><th class="text-center" style="width:40px;">No</th><th>Nama Siswa</th><style style="width:120px;">NISN</style><th class="text-center" style="width:80px;">Hadir</th><th class="text-center" style="width:80px;">Izin</th><th class="text-center" style="width:80px;">Sakit</th><th class="text-center" style="width:80px;">Alpa</th><th class="text-center" style="width:100px;">Persentase</th></tr>`;
             let body = '';
 
             filteredSiswa.forEach((siswa, index) => {
@@ -3313,7 +3773,6 @@
                 list = list.filter(j => j.materi.toLowerCase().includes(searchVal) || j.kegiatan.toLowerCase().includes(searchVal));
             }
 
-            // Gunakan table-layout: fixed agar tidak terpotong, dan lampiran foto menggunakan contain
             const header = `<tr><th class="text-center" style="width:40px;">No</th><th style="width:100px;">Tanggal</th><th style="width:130px;">Mata Pelajaran</th><th class="text-center" style="width:80px;">Semester</th><th style="width:180px;">Materi Pembelajaran</th><th>Rincian Kegiatan Mengajar</th><th class="text-center" style="width:130px;">Dokumentasi</th></tr>`;
             let body = '';
 
@@ -3354,7 +3813,6 @@
             openPrintWindow(`Laporan Desain Kisi-Kisi Instrumen Soal`, header, body);
         }
 
-        // Data Portability
         function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
             const dlAnchorElem = document.createElement('a');
@@ -3372,7 +3830,7 @@
                     const imported = JSON.parse(reader.result);
                     if (imported.siswa && imported.profile && imported.mapel) {
                         appData = imported;
-                        initializeDefaultData(); // Pasang proteksi array baru agar tidak undefined
+                        initializeDefaultData();
                         saveStorage();
                         updateDashboardStats();
                         renderAllTables();
