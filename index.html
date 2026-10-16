@@ -1354,36 +1354,24 @@
             </main>
 
             <!-- NAVBAR BOTTOM UNTUK TAMPILAN MOBILE (ANDROID / IOS / WHATSAPP STYLE) -->
-            <nav id="mobile-bottom-nav" class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 md:hidden flex justify-around items-end px-2 py-2 mobile-nav-shadow pb-safe">
-                <!-- Tab Beranda -->
-                <button onclick="switchTab('beranda')" id="m-btn-beranda" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-brand-600 font-bold transition-all">
-                    <i class="fa-solid fa-house text-lg mb-0.5"></i>
-                    <span class="text-[10px] tracking-tight">Beranda</span>
+            <nav id="mobile-bottom-nav" class="fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 md:hidden flex justify-around items-center px-6 py-2.5 mobile-nav-shadow pb-safe">
+                <!-- Tombol QR Code (Scan Absensi Siswa) -->
+                <button onclick="openQRScannerModal()" class="flex-1 flex flex-col items-center justify-center py-1 text-brand-600 font-bold transition-all active:scale-95">
+                    <div class="w-12 h-12 bg-gradient-to-tr from-brand-700 to-brand-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand-600/30 mb-1">
+                        <i class="fa-solid fa-qrcode text-2xl"></i>
+                    </div>
+                    <span class="text-[11px] tracking-tight font-poppins font-semibold">Scan QR</span>
                 </button>
 
-                <!-- Tab Data Siswa -->
-                <button onclick="switchTab('data-siswa')" id="m-btn-data-siswa" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 font-normal transition-all">
-                    <i class="fa-solid fa-user-group text-lg mb-0.5"></i>
-                    <span class="text-[10px] tracking-tight">Siswa</span>
-                </button>
-
-                <!-- Tombol Center Akses Langsung Scanner QR Code (Style Tombol Utama WhatsApp) -->
-                <div class="flex-1 flex justify-center items-center -mt-5 relative z-10">
-                    <button onclick="openQRScannerModal()" class="w-13 h-13 bg-gradient-to-tr from-brand-700 to-brand-500 text-white rounded-full flex flex-col items-center justify-center shadow-lg shadow-brand-600/40 border-4 border-slate-50 active:scale-90 hover:scale-105 transition-all">
-                        <i class="fa-solid fa-qrcode text-xl"></i>
-                    </button>
-                </div>
-
-                <!-- Tab Absensi -->
-                <button onclick="switchTab('absensi')" id="m-btn-absensi" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-slate-400 font-normal transition-all">
-                    <i class="fa-solid fa-clipboard-user text-lg mb-0.5"></i>
-                    <span class="text-[10px] tracking-tight">Absensi</span>
-                </button>
+                <!-- Pembatas Vertikal Khusus Mobile -->
+                <div class="h-8 w-[1px] bg-slate-200/80 my-auto"></div>
 
                 <!-- Tombol Keluar Sesi Style iOS/Android -->
-                <button onclick="handleLogout()" id="m-btn-keluar" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-1 text-rose-500 font-normal transition-all">
-                    <i class="fa-solid fa-right-from-bracket text-lg mb-0.5"></i>
-                    <span class="text-[10px] tracking-tight">Keluar</span>
+                <button onclick="handleLogout()" id="m-btn-keluar" class="flex-1 flex flex-col items-center justify-center py-1 text-rose-500 font-bold transition-all active:scale-95">
+                    <div class="w-12 h-12 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl flex items-center justify-center shadow-sm mb-1">
+                        <i class="fa-solid fa-right-from-bracket text-xl"></i>
+                    </div>
+                    <span class="text-[11px] tracking-tight font-poppins font-semibold">Keluar</span>
                 </button>
             </nav>
         </div>
@@ -1855,6 +1843,7 @@
                 resultBox.className = "p-3 bg-rose-50 text-rose-800 border border-rose-200 rounded-xl text-xs font-semibold flex items-center gap-2";
                 resultBox.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-600 text-base"></i> Kode "<b>${cleanText}</b>" tidak terdaftar di database siswa!`;
                 resultBox.classList.remove('hidden');
+                speakFemaleVoice("Maaf, QR Code tidak terdaftar");
                 return;
             }
 
@@ -1873,12 +1862,25 @@
                 document.getElementById('absen-tanggal').value = tanggal;
             }
 
-            const statusMode = document.getElementById('qr-status-mode').value || 'Hadir';
-
-            appData.absensi = appData.absensi.filter(a => 
-                !(a.siswaNama === student.nama && a.kelas === kelas && 
-                  a.mapel === mapel && convertToISODate(a.tanggal) === convertToISODate(tanggal))
+            // PENGECEKAN ABSENSI GANDA
+            const isAlreadyScanned = appData.absensi.some(a => 
+                a.siswaNama === student.nama && 
+                a.kelas === kelas && 
+                a.mapel === mapel && 
+                convertToISODate(a.tanggal) === convertToISODate(tanggal)
             );
+
+            if (isAlreadyScanned) {
+                resultBox.className = "p-3 bg-amber-50 text-amber-800 border border-amber-300 rounded-xl text-xs font-semibold flex items-center gap-2";
+                resultBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i> Atas nama <b>${student.nama}</b> (${student.kelas}) sudah melakukan absen hari ini!`;
+                resultBox.classList.remove('hidden');
+
+                showToast(`Atas Nama ${student.nama} Sudah Melakukan Absen Hari Ini!`, false);
+                speakFemaleVoice(`Atas Nama ${student.nama} Sudah Melakukan Absen`);
+                return;
+            }
+
+            const statusMode = document.getElementById('qr-status-mode').value || 'Hadir';
 
             appData.absensi.push({
                 id: Date.now() + Math.random(),
@@ -1895,6 +1897,52 @@
             resultBox.classList.remove('hidden');
 
             showToast(`Absen QR Berhasil: ${student.nama} (${statusMode})`);
+
+            // Suara Perempuan
+            speakFemaleVoice(`Terima kasih ${student.nama}`);
+        }
+
+        // FUNGSI SUARA PEREMPUAN BAHASA INDONESIA (SPEECH SYNTHESIS)
+        function speakFemaleVoice(textToSpeak) {
+            if ('speechSynthesis' in window) {
+                // Hentikan suara yang sedang berjalan
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.9;  // Kecepatan bicara natural
+                utterance.pitch = 1.2; // Nada sedikit lebih tinggi khas perempuan
+
+                let voices = window.speechSynthesis.getVoices();
+                
+                // Cari suara wanita khas Bahasa Indonesia jika tersedia di OS/Browser
+                let idFemaleVoice = voices.find(v => 
+                    v.lang.includes('id') && 
+                    (v.name.toLowerCase().includes('female') || 
+                     v.name.toLowerCase().includes('wanita') || 
+                     v.name.toLowerCase().includes('perempuan') || 
+                     v.name.toLowerCase().includes('gadis') ||
+                     v.name.toLowerCase().includes('google') ||
+                     v.name.toLowerCase().includes('indonesia'))
+                );
+
+                if (!idFemaleVoice) {
+                    idFemaleVoice = voices.find(v => v.lang.includes('id'));
+                }
+
+                if (idFemaleVoice) {
+                    utterance.voice = idFemaleVoice;
+                }
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Pemuatan suara otomatis di Chrome/Safari/Edge saat halaman dimuat
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.getVoices();
+            };
         }
 
         function printKartuQRSiswa() {
