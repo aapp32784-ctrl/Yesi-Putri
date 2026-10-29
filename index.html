@@ -513,9 +513,14 @@
                                 </span>
                                 <input type="text" id="search-siswa" oninput="filterSiswa()" placeholder="Cari nama atau NISN..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition">
                             </div>
-                            <button onclick="openAddModal('data-siswa')" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-600/30 transition-all duration-200">
-                                <i class="fa-solid fa-plus"></i> Tambah Siswa
-                            </button>
+                            <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                                <button onclick="openPullAdmopsModal()" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-600/30 transition-all duration-200">
+                                    <i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data ADMOPS
+                                </button>
+                                <button onclick="openAddModal('data-siswa')" class="w-full sm:w-auto px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-600/30 transition-all duration-200">
+                                    <i class="fa-solid fa-plus"></i> Tambah Siswa
+                                </button>
+                            </div>
                         </div>
 
                         <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
@@ -1315,7 +1320,7 @@
                                     </div>
 
                                     <div class="space-y-2">
-                                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">Informasi : Jangan Dihapus Link Dibawah Ini!</label>
+                                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">URL Web App Google Apps Script</label>
                                         <input type="url" id="google-sheets-url" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white focus:outline-none transition text-sm font-mono" placeholder="https://script.google.com/macros/s/.../exec">
                                     </div>
 
@@ -1335,15 +1340,12 @@
                                 <!-- Pedoman -->
                                 <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 text-xs text-slate-600 leading-relaxed">
                                     <h4 class="font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1">
-                                        <i class="fa-solid fa-circle-info text-brand-600"></i> Fungsi Aplikasi Administrasi Guru : 
+                                        <i class="fa-solid fa-circle-info text-brand-600"></i> Penyebab Umum Gagal Koneksi:
                                     </h4>
                                     <ol class="list-decimal list-inside space-y-2">
-                                        <li>Manajemen Penilaian: Mengolah, merekap, dan menghitung nilai siswa secara otomatis untuk penyusunan laporan hasil belajar.</li>
-                                        <li>Presensi Kehadiran: Mencatat dan memantau kehadiran siswa secara real-time.</li>
-                                        <li>Jurnal Mengajar: Membuat Jurnal Mengajar dengan Mudah.</li>
-                                        <li>Kisi-Kisi Soal: Membuat Kisi-Kisi Soal dengan Cepat.</li>
-                                        <li>Pengelolaan Tugas dan Ujian: Mendistribusikan tugas dan mengelola soal untuk ulangan harian secara digital.</li>
-                                        <li>Penyimpanan Data Terpusat: Menyimpan semua dokumen, materi, dan data siswa di cloud, sehingga lebih aman dan mudah diakses kapan saja.</li>
+                                        <li><strong>Izin Deployment:</strong> Saat Deploy Web App di Apps Script, opsi <em>Who has access (Siapa yang memiliki akses)</em> harus dipilih <strong>"Anyone" (Siapa saja)</strong>.</li>
+                                        <li><strong>Versi Deployment Baru:</strong> Setiap kali mengubah kode Apps Script, Anda wajib memilih <em>Deploy &gt; New deployment</em> agar URL diperbarui.</li>
+                                        <li><strong>Format URL:</strong> Pastikan akhiran URL berupa <code>/exec</code>, bukan <code>/edit</code> atau <code>/dev</code>.</li>
                                     </ol>
                                 </div>
                             </div>
@@ -1567,6 +1569,191 @@
         </div>
     </div>
 
+    <!-- MODAL RESET DATA SELEKTIF (CEKLIS KOMPONEN DATA) -->
+    <div id="reset-data-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden p-6 space-y-5 transform transition-all border border-slate-100 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 shrink-0">
+                <div class="flex items-center space-x-3 text-slate-800 font-poppins font-bold text-base">
+                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800">Pilih Data Yang Akan Direset</h3>
+                        <p class="text-xs text-slate-400 font-normal">Ceklis komponen data yang ingin Anda hapus / kosongkan</p>
+                    </div>
+                </div>
+                <button onclick="closeResetDataModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Area Opsi Ceklis Komponen Data -->
+            <div class="flex-1 overflow-y-auto space-y-3 pr-1">
+                <!-- Check All / Select All Box -->
+                <label class="flex items-center justify-between p-3.5 bg-rose-50/70 border border-rose-200 rounded-2xl cursor-pointer hover:bg-rose-100/50 transition">
+                    <span class="text-xs font-bold text-rose-800 flex items-center gap-2">
+                        <i class="fa-solid fa-square-check text-rose-600 text-base"></i>
+                        <span>Pilih Semua Data (Reset Total Aplikasi)</span>
+                    </span>
+                    <input type="checkbox" id="reset-select-all" onchange="toggleSelectAllResetOptions(this)" class="w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <!-- 1. Data Siswa -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-user-group text-brand-600"></i> Data Siswa
+                        </span>
+                        <input type="checkbox" name="reset-option" value="siswa" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 2. Kepsek & Wali Kelas -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-user-tie text-brand-600"></i> Profil Kepsek & Guru
+                        </span>
+                        <input type="checkbox" name="reset-option" value="profile" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 3. Mata Pelajaran -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-brand-600"></i> Mata Pelajaran
+                        </span>
+                        <input type="checkbox" name="reset-option" value="mapel" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 4. Kategori Penilaian -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-brand-600"></i> Kategori Penilaian
+                        </span>
+                        <input type="checkbox" name="reset-option" value="kategori" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 5. Tahun Pelajaran -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-days text-brand-600"></i> Tahun Pelajaran
+                        </span>
+                        <input type="checkbox" name="reset-option" value="tahun" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 6. Penilaian Siswa -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-star text-brand-600"></i> Nilai Siswa
+                        </span>
+                        <input type="checkbox" name="reset-option" value="penilaian" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 7. Absensi Siswa -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-user text-brand-600"></i> Absensi Siswa
+                        </span>
+                        <input type="checkbox" name="reset-option" value="absensi" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 8. Jurnal Mengajar -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-journal-whills text-brand-600"></i> Jurnal Mengajar
+                        </span>
+                        <input type="checkbox" name="reset-option" value="jurnal" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 9. Kisi-Kisi Soal -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-file-signature text-brand-600"></i> Kisi-Kisi Soal
+                        </span>
+                        <input type="checkbox" name="reset-option" value="kisiKisi" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 10. KOP Surat -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-heading text-brand-600"></i> KOP Surat Dinas
+                        </span>
+                        <input type="checkbox" name="reset-option" value="kop" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 11. Tanda Tangan (TTD) -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-signature text-brand-600"></i> Tanda Tangan (TTD)
+                        </span>
+                        <input type="checkbox" name="reset-option" value="ttd" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+
+                    <!-- 12. URL Google Sheets -->
+                    <label class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition">
+                        <span class="font-semibold text-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-cloud-arrow-up text-brand-600"></i> URL Google Sheets
+                        </span>
+                        <input type="checkbox" name="reset-option" value="sheets_url" class="reset-item-checkbox w-4 h-4 text-rose-600 rounded border-slate-300 focus:ring-rose-500">
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 shrink-0">
+                <button onclick="closeResetDataModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                <button onclick="executeSelectedResetData()" class="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-xl shadow-md transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash-can"></i> Reset Data Terpilih
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TARIK DATA ADMOPS -->
+    <div id="pull-admops-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden p-6 space-y-5 transform transition-all border border-slate-100">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div class="flex items-center space-x-3 text-slate-800 font-poppins font-bold text-sm">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800">Tarik Data Siswa ADMOPS</h3>
+                        <p class="text-xs text-slate-400 font-normal">Singkronkan database siswa dari server ADMOPS</p>
+                    </div>
+                </div>
+                <button onclick="closePullAdmopsModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">Pilih Filter Kelas Siswa</label>
+                    <select id="admops-filter-kelas" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-emerald-500 focus:bg-white focus:outline-none transition">
+                        <option value="Semua">Semua Kelas (Kelas 1 s/d Kelas 6)</option>
+                        <option value="Kelas 1">Kelas 1</option>
+                        <option value="Kelas 2">Kelas 2</option>
+                        <option value="Kelas 3">Kelas 3</option>
+                        <option value="Kelas 4">Kelas 4</option>
+                        <option value="Kelas 5">Kelas 5</option>
+                        <option value="Kelas 6">Kelas 6</option>
+                    </select>
+                    <p class="text-[11px] text-slate-400 italic">Data siswa yang ditarik akan memperbarui NISN, NIK, dan TTL secara otomatis.</p>
+                </div>
+
+                <div id="admops-pull-status" class="hidden p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 flex items-center gap-2">
+                    <i id="admops-pull-status-icon" class="fa-solid fa-spinner animate-spin text-emerald-600"></i>
+                    <span id="admops-pull-status-text">Mengambil data dari server ADMOPS...</span>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+                <button onclick="closePullAdmopsModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Batal</button>
+                <button onclick="executePullFromAdmops()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl shadow-md transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> Tarik Data Sekarang
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL PANDUAN INSTALASI IOS (IPHONE / IPAD) -->
     <div id="ios-install-modal" class="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm hidden">
         <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden p-6 text-center space-y-5 transform transition-all border border-slate-100">
@@ -1613,75 +1800,106 @@
         </div>
     </div>
 
-    <!-- MODAL NOTIFIKASI LOGIN & SINKRONISASI 1%-100% -->
-    <div id="login-loading-modal" class="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden p-8 text-center space-y-6 transform transition-all border border-slate-100">
-            <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
-                <!-- Circular Progress Bar -->
-                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    <path class="text-slate-100" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path id="login-progress-circle" class="text-brand-600 transition-all duration-200 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                </svg>
-                <div class="absolute flex flex-col items-center justify-center">
-                    <span id="login-progress-percent" class="font-poppins font-bold text-2xl text-slate-800">0%</span>
-                </div>
-            </div>
-            <p id="login-progress-status" class="text-xs font-semibold text-slate-500">Memuat Data...</p>
-            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div id="login-progress-bar" class="bg-brand-600 h-full w-0 transition-all duration-200"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL SCANNER QR CODE ABSENSI SISWA -->
-    <div id="qr-scanner-modal" class="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full overflow-hidden p-6 space-y-4 border border-slate-100 relative">
+    <!-- MODAL PANDUAN KODE GOOGLE APPS SCRIPT -->
+    <div id="script-guide-modal" class="fixed inset-0 z-[160] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden p-6 space-y-4 border border-slate-100">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100">
-                <div class="flex items-center space-x-2 text-slate-800 font-poppins font-bold text-base">
-                    <i class="fa-solid fa-qrcode text-brand-600 text-xl"></i>
-                    <span>Scan QR Absensi Siswa</span>
+                <div class="flex items-center space-x-3 text-slate-800 font-poppins font-bold text-base">
+                    <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800">Kode Google Apps Script</h3>
+                        <p class="text-xs text-slate-400 font-normal">Salin kode ini ke Google Sheets Anda (Ekstensi &gt; Apps Script)</p>
+                    </div>
                 </div>
-                <button onclick="stopQRScanner()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+                <button onclick="closeScriptGuideModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
                     <i class="fa-solid fa-xmark text-xl"></i>
                 </button>
             </div>
 
-            <!-- Modal Controls: Status & Switch Camera -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
-                    <label class="block font-semibold text-slate-500 mb-1">Status Kehadiran</label>
-                    <select id="qr-status-mode" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none">
-                        <option value="Hadir" selected>🟢 Hadir</option>
-                        <option value="Izin">🔵 Izin</option>
-                        <option value="Sakit">🟡 Sakit</option>
-                        <option value="Alpa">🔴 Alpa</option>
-                    </select>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-semibold text-slate-600">Kode Apps Script (`Code.gs`)</span>
+                    <button onclick="copyAppsScriptCode()" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition">
+                        <i class="fa-solid fa-copy"></i> Salin Teks Kode
+                    </button>
                 </div>
-                <div>
-                    <label class="block font-semibold text-slate-500 mb-1">Pilih Kamera (Kamera Depan / Belakang)</label>
-                    <select id="qr-camera-select" onchange="switchQRCamera(this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl font-semibold text-slate-700 focus:outline-none">
-                        <option value="">Memuat Kamera...</option>
-                    </select>
-                </div>
+                <pre id="apps-script-code-text" class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto max-h-60 leading-relaxed">
+function doGet(e) {
+  var doc = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = doc.getSheetByName("DATABASE") || doc.getSheets()[0];
+  var cellValue = sheet.getRange("A1").getValue();
+  
+  var result = {};
+  if (cellValue) {
+    try {
+      result = JSON.parse(cellValue);
+    } catch(err) {
+      result = {};
+    }
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify(result))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  try {
+    var doc = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = doc.getSheetByName("DATABASE") || doc.getSheets()[0];
+    
+    var data = e.postData.contents;
+    sheet.getRange("A1").setValue(data);
+    
+    return ContentService.createTextOutput(JSON.stringify({status: "success"}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({status: "error", message: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</pre>
             </div>
 
-            <!-- Video Frame Container -->
-            <div class="relative w-full rounded-2xl overflow-hidden bg-slate-900 border-2 border-brand-500 shadow-inner min-h-[260px] flex items-center justify-center">
-                <div id="qr-reader" class="w-full"></div>
+            <div class="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 space-y-1">
+                <p class="font-bold">Langkah Deployment Google Apps Script:</p>
+                <ol class="list-decimal list-inside space-y-0.5 text-[11px]">
+                    <li>Di Google Sheets, klik menu <strong>Ekstensi &gt; Apps Script</strong>.</li>
+                    <li>Hapus semua kode lama, tempel kode di atas, lalu klik icon <strong>Simpan (💾)</strong>.</li>
+                    <li>Klik <strong>Deploy &gt; Deployment baru (New deployment)</strong>.</li>
+                    <li>Pilih jenis deployment: <strong>Web App (Aplikasi Web)</strong>.</li>
+                    <li>Atur <strong>Who has access (Siapa yang memiliki akses)</strong> menjadi <strong>"Anyone" (Siapa saja)</strong>.</li>
+                    <li>Klik <strong>Deploy</strong>, berikan izin akses akun Google Anda, lalu salin <strong>Web App URL</strong> yang dihasilkan ke input aplikasi ini.</li>
+                </ol>
             </div>
 
-            <!-- Visual Feedback Hasil Scan -->
-            <div id="qr-scan-result" class="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl hidden text-xs font-semibold flex items-center gap-2">
-                <!-- Dynamic Scan Feedback -->
+            <div class="flex justify-end pt-2">
+                <button onclick="closeScriptGuideModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL LOADING & PROGRES SINKRONISASI SAAT LOGIN -->
+    <div id="login-loading-modal" class="fixed inset-0 z-[170] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden p-6 text-center space-y-5 border border-slate-100">
+            <div class="relative w-24 h-24 mx-auto flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path class="text-slate-100" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="login-progress-circle" class="text-brand-600 transition-all duration-300 ease-out" stroke-dasharray="0, 100" stroke-width="3.5" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span id="login-progress-percent" class="absolute font-poppins font-bold text-lg text-slate-800">0%</span>
             </div>
 
-            <div class="text-[11px] text-slate-400 text-center leading-relaxed">
-                Arahkan kamera ke QR Code Kartu Siswa (NISN/Nama). Siswa akan otomatis tercatat di kelas aktif.
+            <div class="space-y-1.5">
+                <h4 class="font-poppins font-bold text-base text-slate-800">Memuat Data Administrasi</h4>
+                <p id="login-progress-status" class="text-xs text-slate-500 font-medium animate-pulse">Menghubungkan ke Google Sheets...</p>
             </div>
 
-            <button onclick="stopQRScanner()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition">
-                Tutup Scanner
-            </button>
+            <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div id="login-progress-bar" class="bg-brand-600 h-full w-0 transition-all duration-300"></div>
+            </div>
         </div>
     </div>
 
@@ -1719,6 +1937,7 @@
 
         // URL Google Sheets Default
         const DEFAULT_SHEETS_URL = "https://script.google.com/macros/s/AKfycby6Ytq1hTjCahmNG8vJb8ifmorJAuas_M_h7ZhFeu2TBaMMEaL-ZRog5hrlscoXMcSsSw/exec";
+        const ADMOPS_GAS_URL = "https://script.google.com/macros/s/AKfycbyA_-hLaFQozmvIB0RNlAIu-xrG5ZysnWsgrEd4VNPt6mZ62Q-KiQGWUie9ds89g3GhWw/exec";
 
         let confirmCallback = null;
 
@@ -2292,7 +2511,7 @@
 
             updateSyncStatus('downloading');
             try {
-                const response = await fetch(url);
+                const response = await fetch(url + (url.includes('?') ? '&' : '?') + 't=' + Date.now());
                 if (!response.ok) throw new Error("Koneksi gagal");
                 const data = await response.json();
                 
@@ -2314,9 +2533,11 @@
 
                     localStorage.setItem('ad_guru_data_safety_backup', JSON.stringify(appData));
                     
-                    appData = data;
-                    localStorage.setItem('ad_guru_data', JSON.stringify(appData));
-                    localStorage.setItem('ad_guru_sheets_connected', 'true');
+                    if (data.siswa || data.penilaian || data.absensi) {
+                        appData = data;
+                        localStorage.setItem('ad_guru_data', JSON.stringify(appData));
+                        localStorage.setItem('ad_guru_sheets_connected', 'true');
+                    }
                     
                     updateSyncStatus('success');
                     updateDashboardStats();
@@ -2330,6 +2551,25 @@
                 updateSyncStatus('error');
                 console.error("Gagal menarik data dari Sheets: ", err);
             }
+        }
+
+        function openScriptGuideModal() {
+            document.getElementById('script-guide-modal').classList.remove('hidden');
+        }
+
+        function closeScriptGuideModal() {
+            document.getElementById('script-guide-modal').classList.add('hidden');
+        }
+
+        function copyAppsScriptCode() {
+            const codeText = document.getElementById('apps-script-code-text').innerText;
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = codeText;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            showToast('Kode Apps Script berhasil disalin!');
         }
 
         function countRecords(db) {
@@ -2473,6 +2713,207 @@
                 confirmCallback();
             }
             confirmCallback = null;
+        }
+
+        // FUNGSI MODAL TARIK DATA DARI ADMOPS
+        function openPullAdmopsModal() {
+            document.getElementById('pull-admops-modal').classList.remove('hidden');
+            document.getElementById('admops-pull-status').classList.add('hidden');
+        }
+
+        function closePullAdmopsModal() {
+            document.getElementById('pull-admops-modal').classList.add('hidden');
+        }
+
+        // FUNGSI DIALOG MODAL SELEKTIF RESET DATA
+        function triggerResetData() {
+            const modal = document.getElementById('reset-data-modal');
+            document.getElementById('reset-select-all').checked = false;
+            document.querySelectorAll('.reset-item-checkbox').forEach(cb => cb.checked = false);
+            modal.classList.remove('hidden');
+        }
+
+        function closeResetDataModal() {
+            document.getElementById('reset-data-modal').classList.add('hidden');
+        }
+
+        function toggleSelectAllResetOptions(masterCheckbox) {
+            const isChecked = masterCheckbox.checked;
+            document.querySelectorAll('.reset-item-checkbox').forEach(cb => {
+                cb.checked = isChecked;
+            });
+        }
+
+        function executeSelectedResetData() {
+            const selectedBoxes = Array.from(document.querySelectorAll('.reset-item-checkbox:checked'));
+            if (selectedBoxes.length === 0) {
+                showToast('Pilih setidaknya satu komponen data yang ingin direset!', false);
+                return;
+            }
+
+            const selectedValues = selectedBoxes.map(cb => cb.value);
+
+            triggerConfirm(
+                'Konfirmasi Reset Data Terpilih?',
+                `Anda memilih ${selectedValues.length} jenis komponen data untuk direset. Data yang terpilih akan dikosongkan.`,
+                () => {
+                    let resetNames = [];
+
+                    selectedValues.forEach(key => {
+                        if (key === 'siswa') {
+                            appData.siswa = [];
+                            resetNames.push('Data Siswa');
+                        } else if (key === 'profile') {
+                            appData.profile = { kepsek: '', nipKepsek: '', guru: 'YESI PUTRI, S.Pd', nipGuru: '' };
+                            resetNames.push('Profil Kepsek & Guru');
+                        } else if (key === 'mapel') {
+                            appData.mapel = [];
+                            resetNames.push('Mata Pelajaran');
+                        } else if (key === 'kategori') {
+                            appData.kategori = [];
+                            resetNames.push('Kategori Penilaian');
+                        } else if (key === 'tahun') {
+                            appData.tahun = [];
+                            resetNames.push('Tahun Pelajaran');
+                        } else if (key === 'penilaian') {
+                            appData.penilaian = [];
+                            resetNames.push('Nilai Siswa');
+                        } else if (key === 'absensi') {
+                            appData.absensi = [];
+                            resetNames.push('Absensi Siswa');
+                        } else if (key === 'jurnal') {
+                            appData.jurnal = [];
+                            resetNames.push('Jurnal Mengajar');
+                        } else if (key === 'kisiKisi') {
+                            appData.kisiKisi = [];
+                            resetNames.push('Kisi-Kisi Soal');
+                        } else if (key === 'kop') {
+                            appData.kop = { logoKiri: '', logoKanan: '', pemda: '', dinas: '', sekolah: '', kecamatan: '', alamat: '', email: '', website: '' };
+                            resetNames.push('KOP Surat Dinas');
+                        } else if (key === 'ttd') {
+                            appData.ttd = { kepsek: '', guru: '' };
+                            resetNames.push('Tanda Tangan TTD');
+                        } else if (key === 'sheets_url') {
+                            localStorage.removeItem('ad_guru_sheets_url');
+                            localStorage.removeItem('ad_guru_sheets_connected');
+                            document.getElementById('google-sheets-url').value = DEFAULT_SHEETS_URL;
+                            resetNames.push('URL Google Sheets');
+                        }
+                    });
+
+                    saveStorage();
+                    updateDashboardStats();
+                    renderAllTables();
+                    closeResetDataModal();
+
+                    const notificationMessage = `Reset berhasil: ${resetNames.slice(0, 3).join(', ')}${resetNames.length > 3 ? ' dan komponen lainnya' : ''}.`;
+                    showToast(notificationMessage);
+                    speakFemaleVoice("Data terpilih telah berhasil direset");
+                }
+            );
+        }
+
+        async function executePullFromAdmops() {
+            const statusBox = document.getElementById('admops-pull-status');
+            const statusText = document.getElementById('admops-pull-status-text');
+            const statusIcon = document.getElementById('admops-pull-status-icon');
+            const targetKelas = document.getElementById('admops-filter-kelas').value;
+
+            statusBox.classList.remove('hidden');
+            statusText.textContent = "Mengambil data dari server ADMOPS...";
+            statusIcon.className = "fa-solid fa-spinner animate-spin text-emerald-600";
+
+            try {
+                const response = await fetch(ADMOPS_GAS_URL + "?t=" + Date.now());
+                if (!response.ok) throw new Error("Gagal terhubung ke ADMOPS");
+
+                const res = await response.json();
+                if (res && res.status === "success" && res.data && Array.isArray(res.data.siswa)) {
+                    let admopsSiswa = res.data.siswa;
+
+                    if (targetKelas !== 'Semua') {
+                        admopsSiswa = admopsSiswa.filter(s => s.kelas === targetKelas);
+                    }
+
+                    if (admopsSiswa.length === 0) {
+                        statusText.textContent = `Tidak ada data siswa ditemukan untuk ${targetKelas} di ADMOPS.`;
+                        statusIcon.className = "fa-solid fa-circle-exclamation text-amber-500";
+                        return;
+                    }
+
+                    let addedCount = 0;
+                    let updatedCount = 0;
+
+                    admopsSiswa.forEach(s => {
+                        const nisnVal = (s.nisn || s.nis || '').toString().trim();
+                        const namaVal = (s.nama || '').trim();
+                        if (!namaVal) return;
+
+                        // Parse TTL ke tempatLahir dan tanggalLahir
+                        let tempatLahir = 'Tanah Keras';
+                        let tanggalLahir = new Date().toISOString().split('T')[0];
+
+                        if (s.ttl) {
+                            const ttlParts = s.ttl.split(',');
+                            if (ttlParts.length >= 2) {
+                                tempatLahir = ttlParts[0].trim();
+                                tanggalLahir = convertToISODate(ttlParts.slice(1).join(',').trim());
+                            } else {
+                                tempatLahir = s.ttl.trim();
+                            }
+                        }
+
+                        let genderVal = 'L';
+                        if (s.jenisKelamin) {
+                            genderVal = (s.jenisKelamin.toLowerCase().includes('p') || s.jenisKelamin.toLowerCase().includes('perempuan')) ? 'P' : 'L';
+                        }
+
+                        const existingIdx = appData.siswa.findIndex(item => 
+                            (nisnVal && item.nis && item.nis.trim() === nisnVal) ||
+                            (item.nama.toLowerCase().trim() === namaVal.toLowerCase() && item.kelas === s.kelas)
+                        );
+
+                        if (existingIdx !== -1) {
+                            appData.siswa[existingIdx] = {
+                                ...appData.siswa[existingIdx],
+                                nama: namaVal,
+                                kelas: s.kelas || appData.siswa[existingIdx].kelas,
+                                nis: nisnVal || appData.siswa[existingIdx].nis,
+                                gender: genderVal,
+                                tempatLahir: tempatLahir,
+                                tanggalLahir: tanggalLahir
+                            };
+                            updatedCount++;
+                        } else {
+                            appData.siswa.push({
+                                id: Date.now() + Math.random(),
+                                nama: namaVal,
+                                kelas: s.kelas || 'Kelas 1',
+                                nis: nisnVal || `NIS-${Math.floor(1000 + Math.random() * 9000)}`,
+                                gender: genderVal,
+                                tempatLahir: tempatLahir,
+                                tanggalLahir: tanggalLahir
+                            });
+                            addedCount++;
+                        }
+                    });
+
+                    saveStorage();
+                    updateDashboardStats();
+                    renderSiswaTable();
+                    closePullAdmopsModal();
+
+                    showToast(`Berhasil menarik data ADMOPS! (${addedCount} Ditambahkan, ${updatedCount} Diperbarui)`);
+                    speakFemaleVoice("Penarikan data siswa dari ADMOPS berhasil");
+                } else {
+                    throw new Error("Format data ADMOPS tidak sesuai");
+                }
+            } catch (err) {
+                console.error("Gagal menarik data ADMOPS:", err);
+                statusText.textContent = "Gagal mengambil data dari ADMOPS! Periksa koneksi internet.";
+                statusIcon.className = "fa-solid fa-circle-xmark text-rose-500";
+                showToast("Gagal mengambil data dari ADMOPS!", false);
+            }
         }
 
         function triggerResetData() {
