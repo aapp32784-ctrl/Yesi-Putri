@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+]<!DOCTYPE html>
 <html lang="id" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
@@ -2345,19 +2345,13 @@ function doPost(e) {
         }
 
         function saveStorage() {
-            localStorage.setItem('ad_guru_data', JSON.stringify(appData));
+            // Data langsung dikirim dan disimpan ke Database Google Sheets
             pushToSheets();
         }
 
         function loadStorage() {
-            const dataStr = localStorage.getItem('ad_guru_data');
-            if (dataStr) {
-                try {
-                    appData = JSON.parse(dataStr);
-                } catch (e) {
-                    console.error("Gagal membaca lokal storage", e);
-                }
-            }
+            // Mengosongkan pemuatan lokal storage, data diambil secara cloud
+            document.getElementById('google-sheets-url').value = getSheetsUrl();
         }
 
         function initializeDefaultData() {
@@ -2535,8 +2529,6 @@ function doPost(e) {
                     
                     if (data.siswa || data.penilaian || data.absensi) {
                         appData = data;
-                        localStorage.setItem('ad_guru_data', JSON.stringify(appData));
-                        localStorage.setItem('ad_guru_sheets_connected', 'true');
                     }
                     
                     updateSyncStatus('success');
@@ -2794,8 +2786,6 @@ function doPost(e) {
                             appData.ttd = { kepsek: '', guru: '' };
                             resetNames.push('Tanda Tangan TTD');
                         } else if (key === 'sheets_url') {
-                            localStorage.removeItem('ad_guru_sheets_url');
-                            localStorage.removeItem('ad_guru_sheets_connected');
                             document.getElementById('google-sheets-url').value = DEFAULT_SHEETS_URL;
                             resetNames.push('URL Google Sheets');
                         }
@@ -2919,11 +2909,8 @@ function doPost(e) {
         function triggerResetData() {
             triggerConfirm(
                 'Reset Semua Data Aplikasi?',
-                'Tindakan ini akan menghapus seluruh data siswa, nilai, absen, jurnal, kisi-kisi, kop surat dan tanda tangan di browser dan Google Sheets Anda.',
+                'Tindakan ini akan menghapus seluruh data siswa, nilai, absen, jurnal, kisi-kisi, kop surat dan tanda tangan di Google Sheets Anda.',
                 () => {
-                    localStorage.removeItem('ad_guru_data');
-                    localStorage.removeItem('ad_guru_sheets_url');
-                    localStorage.removeItem('ad_guru_sheets_connected');
                     appData = {
                         siswa: [], profile: { kepsek: '', nipKepsek: '', guru: 'YESI PUTRI, S.Pd', nipGuru: '' },
                         mapel: [], kategori: [], tahun: [], penilaian: [], absensi: [], jurnal: [], kisiKisi: [],
